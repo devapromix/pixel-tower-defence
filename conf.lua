@@ -1,9 +1,14 @@
 config = {
 	debug = false,
 	
-	audio = {
-		volume = 0.5,
-	},
+    audio = {
+		music = {
+			volume = 0.2,
+			},
+		sound = {
+			volume = 0.2,
+			}
+    },
 	
 	game = {
 		name = 'Pixel Tower Defence',
