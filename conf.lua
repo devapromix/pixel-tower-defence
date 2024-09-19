@@ -27,6 +27,8 @@ keybinds = {
 
 window = {
 	fullscreen = true,
+    width = 1920,
+    height = 1080,
 }
 
 function love.conf (t)
@@ -39,7 +41,7 @@ function love.conf (t)
 	t.window.vsync = false
 	t.identity = config.game.name..config.game.version
 	t.window.title = config.game.name
-	--t.window.width = window.width
-	--t.window.height = window.height
+	t.window.width = window.width
+	t.window.height = window.height
 	t.window.icon = "assets/icons/game.png"
 end
