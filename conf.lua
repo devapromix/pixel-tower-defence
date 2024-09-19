@@ -1,14 +1,14 @@
 config = {
 	debug = false,
 	
-    audio = {
+	audio = {
 		music = {
 			volume = 0.2,
 			},
 		sound = {
 			volume = 0.2,
 			}
-    },
+	},
 	
 	game = {
 		name = 'Pixel Tower Defence',
@@ -32,8 +32,8 @@ keybinds = {
 
 window = {
 	fullscreen = true,
-    width = 1920,
-    height = 1080,
+	width = 1920,
+	height = 1080,
 }
 
 function love.conf (t)
