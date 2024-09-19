@@ -2,7 +2,7 @@ function capitalize(str)
     return (str:gsub("^%l", string.upper))
 end
 
-function barWidth(cx, mx, size)
+function bar_width(cx, mx, size)
 	if cx == mx and cx == 0 then
 		return 0
 	end
