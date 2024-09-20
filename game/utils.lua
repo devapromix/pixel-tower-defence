@@ -26,6 +26,27 @@ function draw_centered_text(left, top, width, height, text)
 	love.graphics.print(text, left + width / 2, top + height / 2, 0, 1, 1, text_width / 2, text_height / 2)
 end
 
+function deep_copy(orig, copies)
+    copies = copies or {}
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        if copies[orig] then
+            copy = copies[orig]
+        else
+            copy = {}
+            copies[orig] = copy
+            setmetatable(copy, deep_copy(getmetatable(orig), copies))
+            for orig_key, orig_value in next, orig, nil do
+                copy[deep_copy(orig_key, copies)] = deep_copy(orig_value, copies)
+            end
+        end
+    else
+        copy = orig
+    end
+    return copy
+end
+
 function distance(from_x, from_y, to_x, to_y)
 	return math.sqrt(
 		(from_x - to_x) * (from_x - to_x)
@@ -142,7 +163,22 @@ function audio_from_cache(path)
 end
 
 
+local function triangle_area(a, b, c)
+    return math.abs(a[1]*(b[2] - c[2]) + b[1]*(c[2] - a[2]) + c[1]*(a[2] - b[2]))/2
+end
 
+local function rect_area(a, b, c, d)
+    return math.abs(a[1]*b[2] - b[1]*a[2] + b[1]*c[2] - c[1]*b[2] + c[1]*d[2] - d[1]*c[2] + d[1]*a[2] - a[1]*d[2])/2
+end
+
+function point_in_rect(a, b, c, d, m)
+    local amb = triangle_area(a, m, b)
+    local bmc = triangle_area(b, m, c)
+    local cmd = triangle_area(c, m, d)
+    local dma = triangle_area(d, m, a)
+    local abcd = rect_area(a, b, c, d)
+    return math.abs(amb + bmc + cmd + dma - abcd) <= 1e-6
+end
 
 
 
