@@ -18,8 +18,8 @@ end
 
 function bullet:getImage()
     self:turnToTarget()
-    local sf = string.format('assets/bullets/%d.png', self.tower.type)
-    return image_from_cache(sf)
+    local image = string.format('assets/images/bullets/%d.png', self.tower.type)
+    return image_from_cache(image)
 end
 
 
