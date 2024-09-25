@@ -149,6 +149,7 @@ local image_cache = {}
 function image_from_cache(path)
     if image_cache[path] == nil then
         image_cache[path] = love.graphics.newImage(path)
+		image_cache[path]:setFilter("nearest", "nearest")
     end
     return image_cache[path]
 end
