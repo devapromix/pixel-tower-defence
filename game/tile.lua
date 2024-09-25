@@ -1,14 +1,14 @@
 local tile = {}
 
 function tile:new(image, towerable)
-    local t = {
-        image = 'assets/images/tiles/' .. image,
+    local _tile = {
+        image = "assets/images/tiles/" .. image,
         tower = nil,
         towerable = towerable,
         rendered = false
     }
     self.__index = self
-    return setmetatable(t, self)
+    return setmetatable(_tile, self)
 end
 
 function tile:getImage()
