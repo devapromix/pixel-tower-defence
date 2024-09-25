@@ -157,7 +157,7 @@ local audio_cache = {}
 
 function audio_from_cache(path)
     if audio_cache[path] == nil then
-        audio_cache[path] = love.audio.newSource('assets/music/' .. path, 'static')
+        audio_cache[path] = love.audio.newSource(path, 'static')
     end
     return audio_cache[path]:clone()
 end
