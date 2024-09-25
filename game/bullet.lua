@@ -46,7 +46,7 @@ function bullet:deserialize(de)
 
     local _bullet = {
         id = de.id,
-        position = deep_copy(tower.position),
+        position = deep_copy(de.position),
         tower = tower,
         target = tower.target,
         rotation = de.rotation
