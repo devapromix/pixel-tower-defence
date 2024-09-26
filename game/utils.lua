@@ -55,6 +55,14 @@ function distance(from_x, from_y, to_x, to_y)
 	)
 end
 
+function distance2(sx, sy, tx, ty)
+    local x_diff = sx - tx
+    local y_diff = sy - ty
+    if x_diff < 0 then x_diff = x_diff * -1 end
+    if y_diff < 0 then y_diff = y_diff * -1 end
+    return math.max(x_diff, y_diff)
+end
+
 function clamp(value, min, max)
   return value < min and min or (value > max and max or value)
 end
@@ -81,20 +89,11 @@ function random_element(list)
 	return list[love.math.random(#list)]
 end
 
-function is_value(tab, val)
-    for _, value in ipairs(tab) do
-        if value == val then
-            return true
-        end
-    end
-    return false
-end
-
 function remove_from_table_by_key(tab, key)
     tab[key] = nil
 end
 
-function amount_value(tab, val)
+function table.amount(tab, val)
 	ret = 0
     for _, value in ipairs(tab) do
         if value == val then
@@ -104,16 +103,30 @@ function amount_value(tab, val)
     return ret
 end
 
-function table_size(tab)
+function table.size(tab)
     local s = 0
     for _ in pairs(tab) do s = s + 1 end
     return s
 end
 
-function table.copy(t)
+function table.copy(tab)
   local u = {}
-  for k, v in pairs(t) do u[k] = v end
-  return setmetatable(u, getmetatable(t))
+  for k, v in pairs(tab) do u[k] = v end
+  return setmetatable(u, getmetatable(tab))
+end
+
+function table.contains(tab, element)
+  for _, value in pairs(tab) do
+    if value == element then
+      return true
+    end
+  end
+  return false
+end
+
+function table.append(dst, src)
+    for i = 1, #src do dst[#dst+1] = src[i] end
+    return dst
 end
 
 function file_exists(path)
@@ -187,9 +200,42 @@ function point_in_rect(a, b, c, d, m)
     return math.abs(amb + bmc + cmd + dma - abcd) <= 1e-6
 end
 
+function dir_from_string(str)
+	if str == "left" then
+		dx = -1 dy = 0
+	elseif str == "right" then
+		dx = 1 dy = 0
+	elseif str == "down" then
+		dx = 0 dy = 1
+	elseif str == "up" then
+		dx = 0 dy = -1
+	end
+	return dx or 0, dy or 0
+end
 
+function string.capitalize(str)
+    if #str > 1 then
+        return string.upper(str:sub(1, 1))..str:sub(2)
+    elseif #str == 1 then
+        return str:upper()
+    else
+        return str
+    end
+end
 
-
+function string.ordinal(number)
+    local suffix = "th"
+    number = tonumber(number)
+    local base = number % 10
+    if base == 1 then
+        suffix = "st"
+    elseif base == 2 then
+        suffix = "nd"
+    elseif base == 3 then
+        suffix = "rd"
+    end
+    return number .. suffix
+end
 
 
 
