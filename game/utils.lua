@@ -1,3 +1,5 @@
+-- MATH --
+
 function capitalize(str)
     return (str:gsub("^%l", string.upper))
 end
@@ -82,15 +84,77 @@ function signum(x)
 	return x/math.abs(x)
 end
 
-function random_element(list)
-	if not list or #list == 0 then
-		return
+function math.round(val)
+	local dec = val - math.floor(val)
+	if dec >= .5 then
+		return math.ceil(val)
+	else
+		return math.floor(val)
 	end
-	return list[love.math.random(#list)]
 end
+
+function math.random_bool()
+	if math.random() >= 0.5 then
+		return true
+	else
+		return false
+	end
+end
+
+-- TABLE --
 
 function remove_from_table_by_key(tab, key)
     tab[key] = nil
+end
+
+function table.random(tab)
+  return tab[math.random(#tab)]
+end
+
+function table.random_key(tab)
+	if (tab[1] ~= nil) then
+		return random(#tab)
+	else
+		local keys = {}
+		for key, obj in pairs(tab) do
+			keys[#keys + 1] = key
+		end
+		return keys[random(#keys)]
+	end
+end
+
+function table.count(tab)
+	local ret = 0
+	for _,__ in pairs(tab) do
+		ret = ret + 1
+	end
+	return ret
+end
+
+function table.shuffle(tab)
+	if table.count(tab) == 1 and #tab == 1 then
+		return tab
+	end
+	local ret = {}
+	while next(tab) ~= nil do
+		local key = table.random_key(tab)
+		ret[#ret + 1] = tab[key]
+		tab[key] = nil
+	end
+	return ret
+end
+
+function table.in_table(needle, haystack)
+	for i, v in pairs(haystack) do
+		if (v == needle) then 
+			return i end
+	end
+	return false
+end
+
+function table.is_empty(tab)
+	local next = next
+	return next(tab) == nil
 end
 
 function table.amount(tab, val)
@@ -110,9 +174,31 @@ function table.size(tab)
 end
 
 function table.copy(tab)
-  local u = {}
-  for k, v in pairs(tab) do u[k] = v end
-  return setmetatable(u, getmetatable(tab))
+	local u = {}
+	for k, v in pairs(tab) do
+		u[k] = v
+	end
+	return setmetatable(u, getmetatable(tab))
+end
+
+function table.copy2(tab)
+	local copy = {}
+	for k, v in pairs(tab) do
+		copy[k] = v
+		if type(v) == 'table' then
+			table.copy2(v)
+		end
+	end
+	return copy
+end
+
+function table.pos(line, col, tab)
+	for index, valeur in ipairs(tab) do
+		if valeur.line == line and valeur.col == col then
+			return index
+		end
+	end
+	return 0
 end
 
 function table.contains(tab, element)
@@ -129,8 +215,108 @@ function table.append(dst, src)
     return dst
 end
 
+-- FILE --
+
 function file_exists(path)
     return love.filesystem.getInfo(path, 'file') ~= nil
+end
+
+-- STRING --
+
+function string.explode(str, delim)
+	local parts = {}
+	for part in string.gmatch(str, "[^" .. delim .."]+") do
+		parts[#parts + 1] = part
+	end
+	return parts
+end
+
+function string.capitalize(str)
+    if #str > 1 then
+        return string.upper(str:sub(1, 1))..str:sub(2)
+    elseif #str == 1 then
+        return str:upper()
+    else
+        return str
+    end
+end
+
+function string.vowel(string)
+	local s = string:sub(1,1)
+	if (s == "a" or s == "e" or s=="i" or s=="o" or s=="u" or s=="sometimes y") then
+		return true
+	end
+	return false
+end
+
+function string.ordinal(number)
+    local suffix = "th"
+    number = tonumber(number)
+    local base = number % 10
+    if base == 1 then
+        suffix = "st"
+    elseif base == 2 then
+        suffix = "nd"
+    elseif base == 3 then
+        suffix = "rd"
+    end
+    return number .. suffix
+end
+
+function string.ucfirst(string)
+	string = tostring(string)
+	return string:gsub("%a", string.upper, 1)
+end
+
+function string.lcfirst(string)
+	string = tostring(string)
+	return string:gsub("%a", string.lower, 1)
+end
+
+-- UTILS --
+
+function list_to_obj(list)
+	local set = {}
+	for _,l in pairs(list) do
+		set[l.name] = l
+	end
+	return set
+end
+
+function obj_to_list(obj)
+	local list = {}
+	for k,v in ipairs(obj) do 
+		list[k] = v 
+	end
+	return list
+end
+
+function echo(s, x, y, c)
+	x, y = math.floor(x), math.floor(y)
+	love.graphics.setColor(25, 25, 25, 255)
+	love.graphics.print(s, x + 1, y + 1)
+	love.graphics.setColor(c, 250)
+	love.graphics.print(s, x, y)
+end
+
+function rgba(r, g, b, a)
+	return {r / 255, g / 255, b / 255, a}
+end
+
+function calc_angle(fromx, fromy, tox, toy)
+	local xdiff = tox - fromx
+	local ydiff = toy - fromy
+	local rad = math.atan2(ydiff, xdiff) + math.pi * .5
+	return 2 * math.pi + rad
+end
+
+function collision(x1, y1, w1, h1, x2, y2, w2, h2)
+	return (
+		x2 < x1 + w1 and
+		x1 < x2 + w2 and
+		y1 < y2 + h2 and
+		y2 < y1 + h1
+	)
 end
 
 function get_left(awidth)
@@ -142,7 +328,7 @@ function get_top(aheight)
 end
 
 function mouse_in(left, top, width, height)
-	x, y = love.mouse.getPosition()
+	local x, y = mouse.get_pos()
 	return (x >= left) and (y >= top) and (x <= left + width) and (y <= top + height)
 end
 
@@ -153,8 +339,8 @@ function get_grid_position(mx, my)
 end
 
 function get_cursor_position()
-	local mx, my = love.mouse.getPosition()
-	return get_grid_position(mx, my)
+	local x, y = mouse.get_pos()
+	return get_grid_position(x, y)
 end
 
 function get_cursor_coord(x, y)
@@ -200,6 +386,13 @@ function point_in_rect(a, b, c, d, m)
     return math.abs(amb + bmc + cmd + dma - abcd) <= 1e-6
 end
 
+function is_rect(px, py, rx, ry, rw, rh)
+	if px > rx and px < rx + rw and py > ry and py < ry + rh then
+		return true
+	else 
+		return false 
+	end
+end
 function dir_from_string(str)
 	if str == "left" then
 		dx = -1 dy = 0
@@ -213,29 +406,19 @@ function dir_from_string(str)
 	return dx or 0, dy or 0
 end
 
-function string.capitalize(str)
-    if #str > 1 then
-        return string.upper(str:sub(1, 1))..str:sub(2)
-    elseif #str == 1 then
-        return str:upper()
-    else
-        return str
-    end
+function random_element(list)
+	if not list or #list == 0 then
+		return
+	end
+	return list[love.math.random(#list)]
 end
 
-function string.ordinal(number)
-    local suffix = "th"
-    number = tonumber(number)
-    local base = number % 10
-    if base == 1 then
-        suffix = "st"
-    elseif base == 2 then
-        suffix = "nd"
-    elseif base == 3 then
-        suffix = "rd"
-    end
-    return number .. suffix
-end
+
+
+
+
+
+
 
 
 
