@@ -25,6 +25,11 @@ config = {
 	}
 }
 
+file = {
+	save = string.lower(config.game.name .. " save.json"),
+	settings = string.lower(config.game.name .. " settings.json"),
+}
+
 keybinds = {
 	fullscreen = "f11",
 	pause = "p",
@@ -44,7 +49,7 @@ function love.conf (t)
 	t.window.display = 1
 	t.window.resizable = false
 	t.window.vsync = false
-	t.identity = config.game.name.." v."..config.game.version
+	t.identity = string.lower(config.game.name.." v."..config.game.version)
 	t.window.title = config.game.name
 	t.window.width = window.width
 	t.window.height = window.height
