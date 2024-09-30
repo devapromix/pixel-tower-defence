@@ -61,20 +61,20 @@ function tower:deserialize(de)
 end
 
 function tower:turnToTarget()
-	local angle = 0 -- Треба покурити як повертати башню
-    if angle < 0 then
-        angle = angle + 360
-    end
+	local angle = math.deg(math.atan2(self.target.position[1] - self.position[1], self.target.position[2] - self.position[2]))
+	if angle < 0 then
+		angle = angle + 360
+	end
 
-    if 45 < angle and angle < 135 then
-        self.rotation = 1
-    elseif 135 < angle and angle < 225 then
-        self.rotation = 2
-    elseif 225 < angle and angle < 315 then
-        self.rotation = 3
-    else
-        self.rotation = 4
-    end
+	if 45 < angle and angle < 135 then
+		self.rotation = 1
+	elseif 135 < angle and angle < 225 then
+		self.rotation = 2
+	elseif 225 < angle and angle < 315 then
+		self.rotation = 3
+	else
+		self.rotation = 4
+	end
 end
 
 function tower:update(state, dt)
