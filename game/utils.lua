@@ -198,6 +198,12 @@ function table.copy2(tab)
 	return copy
 end
 
+function table.values(t)
+	local tt = {}
+	for k, e in pairs(t) do tt[#tt+1] = e end
+	return tt
+end
+
 function table.pos(line, col, tab)
 	for index, valeur in ipairs(tab) do
 		if valeur.line == line and valeur.col == col then
