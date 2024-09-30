@@ -107,6 +107,12 @@ function remove_from_table_by_key(tab, key)
     tab[key] = nil
 end
 
+function table.empty(tab)
+	while next(tab) do
+		tab[next(tab)] = nil
+	end
+end
+
 function table.random(tab)
   return tab[math.random(#tab)]
 end
@@ -213,6 +219,18 @@ end
 function table.append(dst, src)
     for i = 1, #src do dst[#dst+1] = src[i] end
     return dst
+end
+
+function table.lower(t)
+	local tt = {}
+	for i, e in ipairs(t) do tt[i] = e:lower() end
+	return tt
+end
+
+function table.capitalize(t)
+	local tt = {}
+	for i, e in ipairs(t) do tt[i] = e:capitalize() end
+	return tt
 end
 
 -- FILE --
