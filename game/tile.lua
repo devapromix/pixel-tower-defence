@@ -11,7 +11,7 @@ function tile:new(image, towerable)
     return setmetatable(_tile, self)
 end
 
-function tile:getImage()
+function tile:get_image()
     return image_from_cache(self.image)
 end
 

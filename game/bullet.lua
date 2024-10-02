@@ -16,8 +16,8 @@ function bullet:new(tower, enemy)
     return setmetatable(_bullet, self)
 end
 
-function bullet:getImage()
-    self:turnToTarget()
+function bullet:get_image()
+    self:turn_to_target()
     local image = string.format('assets/images/bullets/%d.png', self.tower.type)
     return image_from_cache(image)
 end
@@ -56,23 +56,23 @@ function bullet:deserialize(de)
     return setmetatable(_bullet, self)
 end
 
-function bullet:turnToTarget()
+function bullet:turn_to_target()
     local angle = math.atan2(self.target.position[1] - self.position[1], self.target.position[2] - self.position[2])
     if angle < 0 then
-        angle = angle + 2*math.pi
+        angle = angle + 2 * math.pi
     end
-    self.rotation = math.pi/4 - angle
+    self.rotation = math.pi / 4 - angle
 end
 
 function bullet:update(state, dt)
     local dx = self.target.position[1] - self.position[1]
     local dy = self.target.position[2] - self.position[2]
 
-    self.position[1] = self.position[1] + 10*dx*dt
-    self.position[2] = self.position[2] + 10*dy*dt
+    self.position[1] = self.position[1] + 10 * dx * dt
+    self.position[2] = self.position[2] + 10 * dy * dt
 
     if dx*dx+dy*dy < 0.25 then
-        self.target:takeDamage(state, self.tower:getDamage())
+        self.target:takeDamage(state, self.tower:get_damage())
         if self.tower.type == 1 then
             self.target:froze()
         end
@@ -82,12 +82,12 @@ end
 
 function bullet:draw()
     local u = window.width/2
-    local v = window.height/2 - 6*65
+    local v = window.height/2 - 6 * 65
 
     local bx = u + (self.position[1] - self.position[2]) * 65
     local by = v + (self.position[1] + self.position[2] - 2) * 32
 
-    local image = self:getImage()
+    local image = self:get_image()
     love.graphics.draw(image, bx, by, self.rotation, 1, 1, image:getWidth()/2, image:getHeight()/2)
 end
 
