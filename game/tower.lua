@@ -5,6 +5,7 @@ towerTypes = {
         images = {},
         price = 10,
         damage = 1,
+        attackRange = 3.25,
     }
 }
 
@@ -92,6 +93,22 @@ function tower:draw(state, x, y)
 	love.graphics.draw(self:getImage(), x, y - 16)
     for _, _bullet in pairs(state.bullets) do
         _bullet:draw()
+    end
+end
+
+function tower:getAttackRange()
+    return self.data.attackRange
+end
+
+function tower:findEnemy(state)
+    for _, _enemy in pairs(state.enemies) do
+        local dx = _enemy.position[1] - self.position[1]
+        local dy = _enemy.position[2] - self.position[2]
+        local ar = self:getAttackRange()
+        if (dx * dx) + (dy * dy) <= (ar * ar) and not _enemy.isDead then
+            self.target = _enemy
+            return
+        end
     end
 end
 
