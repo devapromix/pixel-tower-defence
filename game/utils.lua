@@ -81,7 +81,7 @@ function signum(x)
 	if x == 0 then
 		return 0
 	end
-	return x/math.abs(x)
+	return x / math.abs(x)
 end
 
 function math.round(val)

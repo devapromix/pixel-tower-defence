@@ -65,14 +65,14 @@ function bullet:turn_to_target()
 end
 
 function bullet:update(state, dt)
-    local dx = self.target.position[1] - self.position[1]
-    local dy = self.target.position[2] - self.position[2]
+    local x = self.target.position[1] - self.position[1]
+    local y = self.target.position[2] - self.position[2]
 
-    self.position[1] = self.position[1] + 10 * dx * dt
-    self.position[2] = self.position[2] + 10 * dy * dt
+    self.position[1] = self.position[1] + 10 * x * dt
+    self.position[2] = self.position[2] + 10 * y * dt
 
-    if dx*dx+dy*dy < 0.25 then
-        self.target:takeDamage(state, self.tower:get_damage())
+    if x*x+y*y < 0.25 then
+        self.target:take_damage(state, self.tower:get_damage())
         if self.tower.type == 1 then
             self.target:froze()
         end
@@ -81,14 +81,14 @@ function bullet:update(state, dt)
 end
 
 function bullet:draw()
-    local u = window.width/2
-    local v = window.height/2 - 6 * 65
+    local width = window.width / 2
+    local height = window.height / 2 - 6 * 65
 
-    local bx = u + (self.position[1] - self.position[2]) * 65
-    local by = v + (self.position[1] + self.position[2] - 2) * 32
+    local x = width + (self.position[1] - self.position[2]) * 65
+    local y = height + (self.position[1] + self.position[2] - 2) * 32
 
     local image = self:get_image()
-    love.graphics.draw(image, bx, by, self.rotation, 1, 1, image:getWidth()/2, image:getHeight()/2)
+    love.graphics.draw(image, x, y, self.rotation, 1, 1, image:getWidth() / 2, image:getHeight() / 2)
 end
 
 function bullet:destroy(state)
