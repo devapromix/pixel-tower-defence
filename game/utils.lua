@@ -297,6 +297,34 @@ function string.lcfirst(string)
 	return string:gsub("%a", string.lower, 1)
 end
 
+function string.split(s, pat)
+   local i = 1
+   result = {}
+   while true do
+      a, b = s:find(pat, i)
+      if a then
+         table.insert(result, s:sub(i, a - 1))
+         i = b + 1
+      else
+         table.insert(result, s:sub(i))
+         break
+      end
+   end
+   return result
+end
+
+function string.split_text(text, width)
+   local lines = {}
+   for _, w in ipairs(string.split(text, ' ')) do
+      if #lines > 0 and w:len() + lines[#lines]:len() + 1 < width then
+         lines[#lines] = lines[#lines] .. ' ' .. w
+      else
+         table.insert(lines, w)
+      end
+   end
+   return lines
+end
+
 -- UTILS --
 
 function list_to_obj(list)
@@ -349,11 +377,6 @@ end
 
 function get_top(aheight)
 	return math.floor((window.height - aheight) / 2)
-end
-
-function mouse_in(left, top, width, height)
-	local x, y = mouse.get_pos()
-	return (x >= left) and (y >= top) and (x <= left + width) and (y <= top + height)
 end
 
 function get_grid_position(mx, my)
