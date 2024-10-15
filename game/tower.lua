@@ -2,10 +2,12 @@ local bullet = require("game.bullet")
 
 towerTypes = {
     {
-        images = {},
-        price = 10,
-        damage = 1,
-        attackRange = 3.25,
+        images = {'assets/images/towers/tower.png'},
+        price = 50,
+        range = 2.0,
+        interval = 1.5,
+        damage = 8,
+        sound = "arrow.wav"
     }
 }
 
@@ -18,6 +20,7 @@ function tower:new(type, position)
         id = tostring(self.ident),
         data = towerTypes[type],
         target = nil,
+        lastShotAt = 0,
         position = position,
         rotation = 1,
         type = type
@@ -28,13 +31,14 @@ function tower:new(type, position)
     return setmetatable(_tower, self)
 end
 
-function tower:getImage()
+function tower:get_image()
 	return image_from_cache(self.data.images[self.rotation])
 end
 
 function tower:serialize()
     local _tower = {
         id = self.id,
+        lastShotAt = self.lastShotAt,
         position = self.position,
         rotation = self.rotation,
         type = self.type
@@ -52,6 +56,7 @@ function tower:deserialize(de)
         id = de.id,
         data = towerTypes[de.type],
         target = scene.game.enemies[de.target],
+        lastShotAt = de.lastShotAt,
         position = de.position,
         rotation = de.rotation,
         type = de.type
@@ -61,7 +66,7 @@ function tower:deserialize(de)
     return setmetatable(_tower, self)
 end
 
-function tower:turnToTarget()
+function tower:turn_to_target()
 	local angle = math.deg(math.atan2(self.target.position[1] - self.position[1], self.target.position[2] - self.position[2]))
 	if angle < 0 then
 		angle = angle + 360
@@ -78,10 +83,58 @@ function tower:turnToTarget()
 	end
 end
 
+function tower:range()
+    return self.data.range
+end
+
+function tower:interval()
+    return self.data.interval
+end
+
+function tower:get_damage()
+    return self.data.damage
+end
+
+function tower:refund()
+	sound.play("sell.mp3")
+	return 3 * self.data.price / 5
+end
+
+function tower:in_range(x, y)
+	local r = self:range()
+	return x * x + y * y <= r * r
+end
+
+function tower:find_enemy(state)
+    for _, _enemy in pairs(state.enemies) do
+        local x = _enemy.position[1] - self.position[1]
+        local y = _enemy.position[2] - self.position[2]
+        if self:in_range(x, y) and not _enemy.isDead then
+            self.target = _enemy
+            return
+        end
+    end
+end
+
 function tower:update(state, dt)
     if self.target ~= nil then
-        local dx = self.target.position[1] - self.position[1]
-        local dy = self.target.position[2] - self.position[2]
+        local x = self.target.position[1] - self.position[1]
+        local y = self.target.position[2] - self.position[2]
+        if self:in_range(x, y) or self.target.isDead then
+            self.target = nil
+        end
+    end
+
+    self:find_enemy(state)
+
+    if self.target ~= nil then
+        self:turn_to_target()
+        if state.timeNow - self.lastShotAt > self:interval() then
+            self.lastShotAt = state.timeNow
+			sound.play(self.data.sound)
+            local _bullet = bullet:new(self, self.target)
+            state.bullets[_bullet.id] = _bullet
+        end
     end
 
     for _, _bullet in pairs(state.bullets) do
@@ -90,25 +143,9 @@ function tower:update(state, dt)
 end
 
 function tower:draw(state, x, y)
-	love.graphics.draw(self:getImage(), x, y - 16)
+    love.graphics.draw(self:get_image(), x, y - 16)
     for _, _bullet in pairs(state.bullets) do
         _bullet:draw()
-    end
-end
-
-function tower:getAttackRange()
-    return self.data.attackRange
-end
-
-function tower:findEnemy(state)
-    for _, _enemy in pairs(state.enemies) do
-        local dx = _enemy.position[1] - self.position[1]
-        local dy = _enemy.position[2] - self.position[2]
-        local ar = self:getAttackRange()
-        if (dx * dx) + (dy * dy) <= (ar * ar) and not _enemy.isDead then
-            self.target = _enemy
-            return
-        end
     end
 end
 
