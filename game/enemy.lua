@@ -16,6 +16,7 @@ function enemy:new(type, which_path, speed, reward, health)
         position = deep_copy(path[1]),
         speed = speed,
         speedModifier = 1,
+        timeToUnfroze = 0,
         health = health,
         isDead = false,
         reward = reward,
@@ -43,6 +44,7 @@ function enemy:serialize()
         position = self.position,
         speed = self.speed,
         speedModifier = self.speedModifier,
+        timeToUnfroze = self.timeToUnfroze,
         health = self.health,
         isDead = self.isDead,
         reward = self.reward,
@@ -62,6 +64,7 @@ function enemy:deserialize(de)
         position = de.position,
         speed = de.speed,
         speedModifier = de.speedModifier,
+        timeToUnfroze = de.timeToUnfroze,
         health = de.health,
         isDead = de.isDead,
         reward = de.reward,
@@ -90,10 +93,21 @@ function enemy:update(state, dt)
         self.timeSinceFrameChange = self.timeSinceFrameChange - 0.1
     end
 
+    if self.timeToUnfroze <= 0 and self.speedModifier < 1 and not self.isDead then
+        self.speedModifier = 1
+        self.currentFrame = 1
+        self.animationType = ANIMATION_TYPE_RUN
+    end
+    self.timeToUnfroze = self.timeToUnfroze - dt
+
     if self.path_index >= #self.path then
         state.lives = state.lives - 1
         self.isDead = true
         self:destroy(state)
+        return
+    end
+
+    if self.isDead then
         return
     end
 
@@ -134,11 +148,14 @@ function enemy:take_damage(state, amount)
 	if self.health <= 0 then
 		self.isDead = true
 		state.money = state.money + self.reward
+		self.currentFrame = 1
+		self.animationType = ANIMATION_TYPE_DIE
 	end
 end
 
 function enemy:froze()
---Заморозка
+	self.speedModifier = 0.5
+	self.timeToUnfroze = 1
 end
 
 function enemy:destroy(state)
